@@ -3,209 +3,235 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Q2Admin – Quake II server administration</title>
+<title>Q2Admin - Quake II Admin</title>
 <meta name="description" content="Q2Admin is an open-source administration and anti-cheat layer for Quake II servers. Works with any mod, no mod changes needed.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;1,400&family=Big+Shoulders+Stencil+Display:wght@700;900&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: dark;
-    --steel: #23251c;
-    --steel-2: #2d3024;
-    --bone: #ddd6bf;
-    --muted: #9a967f;
-    --amber: #e8b52e;
-    --rust: #a2401f;
-    --chat: #8fcf5a;
-    --stencil: "Big Shoulders Stencil Display", Impact, sans-serif;
-    --body: Barlow, "Helvetica Neue", Arial, sans-serif;
-    --console: VT323, ui-monospace, monospace;
+    color-scheme: light;
+    --frame: #2b2a26;
+    --panel: #d8d3c4;
+    --panel-2: #c9c3b1;
+    --ink: #1d1b16;
+    --bar-1: #6a5636;
+    --bar-2: #3d3222;
+    --bar-ink: #f0e0b0;
+    --link: #8a2c0e;
+    --visited: #5d3a6e;
+    --hud: #e8b52e;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--steel); color: var(--bone); font: 1.125rem/1.6 var(--body); }
-  a { color: var(--amber); text-underline-offset: 3px; }
-  a:hover { color: var(--bone); }
-  :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
-  code { font-family: var(--console); font-size: 1.15em; color: var(--amber); }
-  pre { margin: 0; font: 1.25rem/1.3 var(--console); color: var(--bone); background: #191a14; border-left: 4px solid var(--rust); padding: 1rem 1.25rem; overflow-x: auto; }
-  pre code { color: inherit; font-size: inherit; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
-  h1, h2, h3 { font-family: var(--stencil); font-weight: 900; line-height: 1; margin: 0; letter-spacing: .01em; }
-  h2 { font-size: clamp(2.6rem, 7vw, 4.5rem); color: var(--amber); margin-bottom: 1.5rem; }
-  h3 { font-size: 1.6rem; font-weight: 700; margin-bottom: .75rem; }
-  section { padding: 5rem 0; }
-  .measure { max-width: 38rem; }
+  body {
+    margin: 0; padding: 20px 10px 40px; color: var(--ink);
+    font: 14px/1.55 Verdana, Tahoma, "DejaVu Sans", sans-serif;
+    background-color: var(--frame);
+    /* riveted floor plate, drawn in CSS */
+    background-image:
+      radial-gradient(circle at 4px 4px, #4a4840 1.5px, transparent 2px),
+      linear-gradient(45deg, #302f2a 25%, transparent 25%, transparent 75%, #302f2a 75%);
+    background-size: 40px 40px, 8px 8px;
+  }
+  a { color: var(--link); }
+  a:visited { color: var(--visited); }
+  a:hover { color: #000; background: var(--hud); text-decoration: none; }
+  :focus-visible { outline: 2px dotted #000; outline-offset: 1px; background: var(--hud); }
 
-  .bar { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; padding-top: 1.5rem; }
-  .brand { font-family: var(--stencil); font-weight: 900; font-size: 1.8rem; color: var(--bone); text-decoration: none; }
-  nav { display: flex; gap: 1.4rem; flex-wrap: wrap; }
-  nav a { color: var(--muted); text-decoration: none; }
-  nav a:hover { color: var(--amber); }
+  .page { max-width: 880px; margin: 0 auto; border: 3px outset #8c8676; background: var(--panel); }
 
-  .intro { padding: 3.5rem 0 5rem; }
-  h1 { font-size: clamp(3.2rem, 11vw, 7.5rem); color: var(--bone); max-width: 11ch; margin-bottom: 1.5rem; }
-  .intro p { font-size: 1.3rem; color: var(--muted); }
-  .go { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; font-weight: 600; }
-  .go a:first-child { background: var(--amber); color: var(--steel); padding: .65rem 1.4rem; text-decoration: none; clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%); }
-  .go a:first-child:hover { background: var(--bone); }
-  .go a { align-self: center; }
+  header { background: linear-gradient(#5c584c, #34322b); border-bottom: 3px ridge #8c8676; padding: 18px 16px 12px; }
+  .logo { font: 54px/1 Impact, "Arial Narrow Bold", sans-serif; color: var(--hud); letter-spacing: 2px; text-shadow: 2px 2px 0 #000, -1px -1px 0 #8a6a1a; margin: 0; }
+  .tag { color: #cfc8b4; margin: 4px 0 0; font-size: 12px; }
 
-  /* layer stack */
-  #how { background: var(--steel-2); }
-  .stack { display: grid; gap: 6px; margin-top: 2.5rem; }
-  .plate { display: grid; grid-template-columns: 15rem 1fr; gap: 1.5rem; align-items: center; padding: 1.25rem 1.5rem; background: #3a3d2f; }
-  .plate b { font-family: var(--stencil); font-size: 1.7rem; line-height: 1.05; }
-  .plate span { color: var(--muted); }
-  .plate.q2a { background: var(--amber); color: var(--steel); margin: 0 -12px; padding: 1.75rem calc(1.5rem + 12px); }
-  .plate.q2a span { color: #3a3010; }
-  @media (max-width: 700px) { .plate { grid-template-columns: 1fr; gap: .4rem; } }
+  nav { background: #1e1d19; color: #8c8676; padding: 6px 12px; font-size: 12px; border-bottom: 2px solid #000; }
+  nav a, nav a:visited { color: #e6dcc0; text-decoration: none; }
+  nav a:hover { color: #000; }
 
-  /* features */
-  .groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; margin-top: 3rem; }
-  @media (max-width: 860px) { .groups { grid-template-columns: 1fr; gap: 2.5rem; } }
-  .groups h3 { border-bottom: 3px solid var(--rust); padding-bottom: .5rem; }
-  dl { margin: 0; }
-  dt { font-weight: 600; margin-top: 1.1rem; }
-  dd { margin: .15rem 0 0; color: var(--muted); font-size: 1rem; }
+  .cols { display: grid; grid-template-columns: 200px 1fr; gap: 14px; padding: 14px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } aside { order: 2; } }
+  main, aside { min-width: 0; }
 
-  /* install */
-  #install { background: var(--steel-2); }
-  .install { display: grid; grid-template-columns: 1.1fr 1fr; gap: 3.5rem; }
-  .install > div { min-width: 0; } /* lets wide code blocks scroll instead of stretching the page */
-  @media (max-width: 860px) { .install { grid-template-columns: 1fr; } }
-  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
-  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 3rem 1fr; margin-bottom: 1.4rem; }
-  ol.steps li::before { content: counter(s); font: 900 2.4rem/1 var(--stencil); color: var(--rust); }
-  .install h3 { margin-top: 2rem; } .install h3:first-child { margin-top: 0; }
-  .install .note { color: var(--muted); font-size: 1rem; }
+  .box { border: 2px inset #b3ad9c; background: var(--panel); margin-bottom: 14px; }
+  .box > h2, .box > h3 {
+    margin: 0; padding: 3px 8px; font-size: 13px; font-weight: bold; color: var(--bar-ink);
+    background: linear-gradient(var(--bar-1), var(--bar-2)); border-bottom: 1px solid #000;
+  }
+  .box .in { padding: 10px 12px; }
+  .box .in > :first-child { margin-top: 0; }
+  .box .in > :last-child { margin-bottom: 0; }
+  aside .box { background: var(--panel-2); font-size: 12px; }
+  aside ul { margin: 0; padding-left: 16px; }
 
-  /* history */
-  .era { display: grid; grid-template-columns: 13rem 1fr; gap: 2rem; padding: 2rem 0; border-top: 2px solid #3a3d2f; }
-  .era:last-child { border-bottom: 2px solid #3a3d2f; }
-  .era .when { font: 900 2.2rem/1 var(--stencil); color: var(--rust); }
-  .era p { margin: .5rem 0 0; color: var(--muted); max-width: 40rem; }
-  @media (max-width: 700px) { .era { grid-template-columns: 1fr; gap: .5rem; } }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #9c9583; padding: 4px 7px; text-align: left; vertical-align: top; }
+  th { background: var(--panel-2); }
+  tr:nth-child(even) td { background: #d1cbbb; }
 
-  footer { padding: 3rem 0 4rem; color: var(--muted); font-size: 1rem; }
-  footer .legal { color: var(--bone); max-width: 44rem; }
+  pre, code { font-family: "Courier New", Courier, monospace; }
+  code { font-size: 13px; }
+  pre { background: #ece8dc; border: 2px inset #b3ad9c; padding: 8px 10px; overflow-x: auto; font-size: 13px; margin: 8px 0 12px; }
+  .diagram { background: #1e1d19; color: #e6dcc0; border-color: #555; }
+
+  dl.dates dt { font-weight: bold; margin-top: 10px; }
+  dl.dates dd { margin: 2px 0 0 16px; }
+
+  footer { border-top: 3px ridge #8c8676; background: #34322b; color: #cfc8b4; padding: 10px 14px; font-size: 11px; }
+  footer a, footer a:visited { color: #e6dcc0; }
+  footer p { margin: 4px 0; }
 </style>
 </head>
 <body>
+<div class="page">
 
-<header class="wrap bar">
-  <a class="brand" href="#">Q2Admin</a>
-  <nav aria-label="Main">
-    <a href="#how">How it works</a>
-    <a href="#features">Features</a>
-    <a href="#install">Install</a>
-    <a href="#history">History</a>
-    <a href="https://github.com/packetflinger/q2admin">GitHub</a>
-  </nav>
+<header>
+  <p class="logo">Q2ADMIN</p>
+  <p class="tag">Admin tools and anti-cheat for Quake II servers. Any mod, no mod changes.</p>
 </header>
 
+<nav aria-label="Main">
+  <a href="#about">home</a> |
+  <a href="#features">features</a> |
+  <a href="#install">install</a> |
+  <a href="#history">history</a> |
+  <a href="#credits">credits</a> |
+  <a href="https://github.com/packetflinger/q2admin/blob/dev/README.md">docs</a> |
+  <a href="https://github.com/packetflinger/q2admin">github</a>
+</nav>
+
+<div class="cols">
 <main>
-<div class="wrap intro">
-  <h1>Keep your Quake II server clean</h1>
-  <div class="measure">
-    <p>Q2Admin loads between the server and your mod, and adds the admin tools and anti-cheat Quake II never shipped with. It works with deathmatch, CTF, OpenTDM, Action, Rocket Arena 2, Jump and anything else, without changing the mod.</p>
-  </div>
-  <div class="go">
-    <a href="#install">Install Q2Admin</a>
-    <a href="https://github.com/packetflinger/q2admin/blob/main/README.md">Read the documentation</a>
-  </div>
-</div>
 
-<section id="how">
-  <div class="wrap">
-    <h2>How it works</h2>
-    <div class="measure">
-      <p>A Quake II server runs its gameplay from a game library, such as <code>gamex86_64.so</code>. Q2Admin is a game library too. The server loads Q2Admin, and Q2Admin loads your real mod and passes every call through.</p>
+  <section class="box" id="about">
+    <h2>What is Q2Admin?</h2>
+    <div class="in">
+      <p>Q2Admin is a server-side admin and anti-cheat layer for Quake II. It sits between the server and whatever mod you run, such as deathmatch, CTF, OpenTDM, Action, Rocket Arena 2 or Jump, and adds cheat detection, bans, flood control, voting, logging and more. The mod itself is never changed.</p>
+      <p>A Quake II server runs its gameplay from a game library like <code>gamex86_64.so</code>. Q2Admin is a game library too. The server loads Q2Admin, and Q2Admin loads the real mod and passes every call through:</p>
+<pre class="diagram" aria-label="Diagram: the Quake II server calls Q2Admin, which passes calls on to the real mod">
+ Quake II server  ---&gt;  Q2Admin  ---&gt;  real mod
+ (q2pro, r1q2,          checks,         (gamex86_64.real.so)
+  yquake2, ...)         bans, logs
+</pre>
+      <p>So every connection, command, chat line, movement packet and map entity goes past Q2Admin first.</p>
     </div>
-    <div class="stack">
-      <div class="plate"><b>Quake II server</b><span>Q2Pro, R1Q2, Yamagi Quake II or the original.</span></div>
-      <div class="plate q2a"><b>Q2Admin</b><span>Sees every connection, command, chat line, movement packet and map entity. Blocks, filters, probes and logs before passing them on.</span></div>
-      <div class="plate"><b>Your mod</b><span>Renamed to <code>gamex86_64.real.so</code> and left untouched.</span></div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="features">
-  <div class="wrap">
-    <h2>What it adds</h2>
-    <div class="groups">
-      <div>
-        <h3>Catch cheaters</h3>
-        <dl>
-          <dt>Proxy and client checks</dt><dd>Randomized probes that zbot, ratbot and hacked clients answer wrong.</dd>
-          <dt>Aim analysis</dt><dd>Spots bot jitter, silent-aim snaps and inhumanly steady tracking.</dd>
-          <dt>Speed hacks</dt><dd>Flags players who use more game time than the clock allows.</dd>
-          <dt>Signal scores</dt><dd>Adds up suspicious events, so you act on patterns, not single hits.</dd>
-          <dt>VPN detection</dt><dd>Flags VPN and hosting addresses, so kicked players can't just come back.</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Keep order</h3>
-        <dl>
-          <dt>Bans</dt><dd>By name, IP or range, timed or permanent, with lists shared between servers.</dd>
-          <dt>Flood control</dt><dd>Limits chat, name changes, skin changes and connection floods.</dd>
-          <dt>Mute and chat filters</dt><dd>Silence or filter players without kicking them.</dd>
-          <dt>Client settings</dt><dd>Requires allowed values for client cvars and blocks mod commands you don't want used.</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Run the server</h3>
-        <dl>
-          <dt>Voting</dt><dd>Players vote on commands you allow, even in mods with no voting.</dd>
-          <dt>Limited rcon</dt><dd>Moderators get only the commands you choose.</dd>
-          <dt>Logs</dt><dd>Connections, chat, kicks, bans and detections in separate files.</dd>
-          <dt>Modern engines</dt><dd>IPv6, variable frame rates and Q2Pro demo recording.</dd>
-        </dl>
-      </div>
+  <section class="box" id="features">
+    <h2>Features</h2>
+    <div class="in">
+      <table>
+        <tr><th scope="col">Feature</th><th scope="col">What it does</th></tr>
+        <tr><td>Proxy checks</td><td>Sends randomized probes that zbot, ratbot and hacked clients answer wrong.</td></tr>
+        <tr><td>Aim analysis</td><td>Spots bot jitter, silent-aim snaps and inhumanly steady tracking.</td></tr>
+        <tr><td>Speed hacks</td><td>Flags players who use more game time than the clock allows.</td></tr>
+        <tr><td>Signal scores</td><td>Adds up suspicious events so you act on patterns, not single hits.</td></tr>
+        <tr><td>VPN detection</td><td>Flags VPN and hosting addresses so kicked players can't just come back.</td></tr>
+        <tr><td>Bans</td><td>By name, IP or range, timed or permanent, with lists shared between servers.</td></tr>
+        <tr><td>Flood control</td><td>Limits chat, name changes, skin changes and connection floods.</td></tr>
+        <tr><td>Mute and chat filters</td><td>Silence or filter players without kicking them.</td></tr>
+        <tr><td>Client settings</td><td>Requires allowed values for client cvars and blocks mod commands.</td></tr>
+        <tr><td>Voting</td><td>Players vote on commands you allow, even in mods with no voting.</td></tr>
+        <tr><td>Limited rcon</td><td>Moderators get only the commands you choose.</td></tr>
+        <tr><td>Logs</td><td>Connections, chat, kicks, bans and detections in separate files.</td></tr>
+        <tr><td>Modern engines</td><td>IPv6, variable frame rates and Q2Pro demo recording.</td></tr>
+      </table>
+      <p>Every option and command is in the <a href="https://github.com/packetflinger/q2admin/blob/dev/README.md">README</a>.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="install">
-  <div class="wrap install">
-    <div>
-      <h2>Install</h2>
-      <ol class="steps">
-        <li><span><b>Build Q2Admin</b> for your platform. The server, Q2Admin and the mod must all be 32-bit or all 64-bit.</span></li>
-        <li><span><b>Rename your mod</b>, for example to <code>gamex86_64.real.so</code>, or set <code>gamelibrary</code> in <code>q2admin.cfg</code>.</span></li>
-        <li><span><b>Put Q2Admin</b> in the mod folder under the name the server loads, such as <code>opentdm/gamex86_64.so</code>.</span></li>
-        <li><span><b>Copy the example configs</b> from <a href="https://github.com/packetflinger/q2admin/tree/main/runtime-config">runtime-config</a> and edit <code>q2admin.cfg</code>.</span></li>
-        <li><span><b>Start the server.</b> Q2Admin prints its version as it loads.</span></li>
+  <section class="box" id="install">
+    <h2>Install</h2>
+    <div class="in">
+      <ol>
+        <li>Build Q2Admin for your platform. The server, Q2Admin and the mod must all be 32-bit or all 64-bit.</li>
+        <li>Rename your mod, for example to <code>gamex86_64.real.so</code>, or set <code>gamelibrary</code> in <code>q2admin.cfg</code>.</li>
+        <li>Put Q2Admin in the mod folder under the name the server loads, such as <code>opentdm/gamex86_64.so</code>.</li>
+        <li>Copy the example configs from <a href="https://github.com/packetflinger/q2admin/tree/dev/runtime-config">runtime-config</a> and edit <code>q2admin.cfg</code>.</li>
+        <li>Start the server. Q2Admin prints its version as it loads.</li>
       </ol>
-    </div>
-    <div>
-      <h3>Build on Linux</h3>
-<pre><code>git clone https://github.com/packetflinger/q2admin
+      <p><b>Building on Linux:</b></p>
+<pre>git clone https://github.com/packetflinger/q2admin
 cd q2admin
-make</code></pre>
-      <p class="note">On x86_64 and arm64 every library is bundled, so a compiler is all you need. Windows builds use MinGW and macOS builds use Homebrew. <a href="https://github.com/packetflinger/q2admin/blob/main/README.md#compiling">Build instructions</a></p>
-      <h3>Run an admin command</h3>
-<pre><code>sv !kick CL 3
-rcon mypassword sv !mute claire 60</code></pre>
+make</pre>
+      <p>On x86_64 and arm64 every library is bundled, so a compiler is all you need. Windows builds use MinGW and macOS builds use Homebrew. See <a href="https://github.com/packetflinger/q2admin/blob/dev/README.md#compiling">Compiling</a>.</p>
+      <p><b>Running admin commands</b> from the console or rcon:</p>
+<pre>sv !kick CL 3
+rcon mypassword sv !mute claire 60</pre>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="history">
-  <div class="wrap">
-    <h2>Twenty-plus years on Quake II servers</h2>
-    <div class="era"><div class="when">Late 1990s</div><div><h3>The original</h3><p>Shane Powell (KillerBee) wrote Q2Admin as a drop-in proxy mod to fight the zbot and ratbot aim proxies spreading through Quake II servers.</p></div></div>
-    <div class="era"><div class="when">2000s</div><div><h3>Community fixes</h3><p>Richard Stanway (R1CH), author of the R1Q2 engine, fixed bugs. Mars contributed source changes, and fixes from q2mods.org were folded in.</p></div></div>
-    <div class="era"><div class="when">2007–2008</div><div><h3>q2admin.net</h3><p>MDVz0r and Jasper of z0r.nl released versions 1.17.45 to 1.17.52. They added shared remote ban lists, global exception lists for R1CH's anticheat, nick registration, and ready-to-run server installers for Action Quake 2 and OSP Tourney. Hifi helped with support and debugging, and everyone met in #q2admin on QuakeNet.</p></div></div>
-    <div class="era"><div class="when">Today</div><div><h3>PacketFlinger</h3><p>PacketFlinger maintains Q2Admin <a href="https://github.com/packetflinger/q2admin">on GitHub</a>, adding 64-bit and arm64 builds, aim analysis, VPN detection, signal scoring, IPv6 and Cloud Admin for running many servers at once (in development). Thanks to <a href="https://github.com/packetflinger/q2admin/graphs/contributors">every contributor</a>.</p></div></div>
-  </div>
-</section>
+  <section class="box" id="history">
+    <h2>History</h2>
+    <div class="in">
+      <dl class="dates">
+        <dt>Late 1990s</dt>
+        <dd>Shane Powell (KillerBee) wrote Q2Admin as a drop-in proxy mod to fight the zbot and ratbot aim proxies spreading through Quake II servers.</dd>
+        <dt>2000s</dt>
+        <dd>Richard Stanway (R1CH), author of the R1Q2 engine, fixed bugs. Mars contributed source changes, and fixes from q2mods.org were folded in.</dd>
+        <dt>2007 - 2008</dt>
+        <dd>MDVz0r and Jasper of z0r.nl ran q2admin.net and released versions 1.17.45 to 1.17.52, adding shared remote ban lists, global exception lists for R1CH's anticheat, nick registration and ready-to-run server installers for Action Quake 2 and OSP Tourney. Support happened in #q2admin on QuakeNet.</dd>
+        <dt>Today</dt>
+        <dd>PacketFlinger maintains Q2Admin on GitHub, adding 64-bit and arm64 builds, aim analysis, VPN detection, signal scoring, IPv6 and Cloud Admin for running many servers at once (in development).</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="box" id="credits">
+    <h2>Credits</h2>
+    <div class="in">
+      <table>
+        <tr><th scope="col">Who</th><th scope="col">For</th></tr>
+        <tr><td>KillerBee (Shane Powell)</td><td>The original creator of the Q2Admin project.</td></tr>
+        <tr><td>R1CH (Richard Stanway)</td><td>Fixing bugs.</td></tr>
+        <tr><td>Mars</td><td>Work on the Q2Admin source.</td></tr>
+        <tr><td>MDVz0r and Jasper</td><td>q2admin.net and new features.</td></tr>
+        <tr><td>Hifi</td><td>Support and debugging.</td></tr>
+        <tr><td>PacketFlinger</td><td>Current maintainer.</td></tr>
+        <tr><td><a href="https://github.com/packetflinger/q2admin/graphs/contributors">Contributors</a></td><td>Everyone who has sent code on GitHub.</td></tr>
+      </table>
+    </div>
+  </section>
+
 </main>
 
-<footer class="wrap">
-  <p class="legal">Q2Admin is an open-source hobby project. It is not affiliated with, endorsed by or connected in any way to id Software, Bethesda, ZeniMax, Microsoft or any other company that owns the rights to the Quake franchise. Quake is a trademark of its respective owner.</p>
-  <p>Source code and issues on <a href="https://github.com/packetflinger/q2admin">GitHub</a>.</p>
+<aside>
+  <section class="box">
+    <h3>Get Q2Admin</h3>
+    <div class="in">
+      <ul>
+        <li><a href="https://github.com/packetflinger/q2admin">Source code</a></li>
+        <li><a href="https://github.com/packetflinger/q2admin/releases">Releases</a></li>
+        <li><a href="https://github.com/packetflinger/q2admin/issues">Report a bug</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="box">
+    <h3>Documentation</h3>
+    <div class="in">
+      <ul>
+        <li><a href="https://github.com/packetflinger/q2admin/blob/dev/README.md#installation">Installation</a></li>
+        <li><a href="https://github.com/packetflinger/q2admin/blob/dev/README.md#configuration-reference">Config options</a></li>
+        <li><a href="https://github.com/packetflinger/q2admin/blob/dev/README.md#commands">Commands</a></li>
+        <li><a href="https://github.com/packetflinger/q2admin/blob/dev/README.md#compiling">Compiling</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="box">
+    <h3>Works with</h3>
+    <div class="in">
+      <ul>
+        <li>Q2Pro</li>
+        <li>R1Q2</li>
+        <li>Yamagi Quake II</li>
+        <li>Linux, Windows, macOS</li>
+      </ul>
+    </div>
+  </section>
+</aside>
+</div>
+
+<footer>
+  <p>Q2Admin is an open-source hobby project. It is not affiliated with, endorsed by or connected in any way to id Software, Bethesda, ZeniMax, Microsoft or any other company that owns the rights to the Quake franchise. Quake is a trademark of its respective owner.</p>
+  <p><a href="https://github.com/packetflinger/q2admin">github.com/packetflinger/q2admin</a></p>
 </footer>
 
+</div>
 </body>
 </html>
